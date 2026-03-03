@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gantt Generator — Signaturit</title>
+<title>Gantt Chart Generator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
@@ -155,15 +155,15 @@
   <div class="toolbar-title">Gantt Generator</div>
   <div class="toolbar-group">
     <label>Título:</label>
-    <input type="text" id="chartTitle" value="Tiempos de Ejecución" oninput="render()">
+    <input type="text" id="chartTitle" value="Project Timeline" oninput="render()">
   </div>
   <div class="toolbar-group">
     <label>Subtítulo:</label>
-    <input type="text" id="chartSubtitle" value="Plan Proyecto MUTUA — Abr / May 2026" oninput="render()">
+    <input type="text" id="chartSubtitle" value="Project Plan — Q2 2026" oninput="render()">
   </div>
   <div class="toolbar-group">
     <label>Inicio:</label>
-    <input type="date" id="startDate" value="2026-04-01" onchange="render()">
+    <input type="date" id="startDate" value="2026-04-06" onchange="render()">
   </div>
   <div class="toolbar-group">
     <label>Días/sem:</label>
@@ -171,11 +171,11 @@
   </div>
   <div class="toolbar-group">
     <label>Footer:</label>
-    <input type="text" id="footerLogo" value="Signaturit Group" oninput="render()" style="width:120px">
+    <input type="text" id="footerLogo" value="Company Name" oninput="render()" style="width:120px">
   </div>
   <div class="toolbar-group">
     <label>Versión:</label>
-    <input type="text" id="footerVersion" value="Mutua — Versión 03/2026" oninput="render()" style="width:150px">
+    <input type="text" id="footerVersion" value="v1.0 — 2026" oninput="render()" style="width:150px">
   </div>
   <div class="toolbar-spacer"></div>
   <button class="btn btn-danger" onclick="resetAll()">🗑 Reset</button>
@@ -267,13 +267,12 @@
 <script>
 let bgMode = 'solid';
 let phases = [
-  { name: "1. Preparación de entornos SaaS", color: "#0000cc", startWeek: 1, durationWeeks: 1, tasks: ["Crear organización en demo", "Activar motor de firma", "Acceso a inhouse actual"] },
-  { name: "2. Configuración de autenticación", color: "#1a1adf", startWeek: 2, durationWeeks: 1, tasks: ["Definir SAML / SSO", "Configurar Key Controller"] },
-  { name: "3. Pruebas funcionales en Sandbox", color: "#3333e6", startWeek: 3, durationWeeks: 1, tasks: ["Habilitar entorno Sandbox", "Pruebas flujos de firma", "Certificados biométricos + Wacom", "Conectividad app biometría"] },
-  { name: "4. Coordinación con Camerfirma", color: "#4d4ded", startWeek: 4, durationWeeks: 1, tasks: ["Extracción certificados inhouse", "Reemisión en cloud"] },
-  { name: "5. Migración de certificados", color: "#6666f0", startWeek: 5, durationWeeks: 1, tasks: ["Importar certificados en SaaS", "Validar PINes", "Replicar delegaciones", "Preservar claves integración"] },
-  { name: "6. Replicar en producción", color: "#1a1adf", startWeek: 6, durationWeeks: 1, tasks: ["Crear organización en prod", "Aplicar configuraciones", "Redirigir app biométrica"] },
-  { name: "7. Pruebas finales y estabilización", color: "#0000cc", startWeek: 7, durationWeeks: 1, tasks: ["Pruebas end-to-end en prod", "Monitorización activa", "Resolución de incidencias"] }
+  { name: "1. Discovery & Planning", color: "#0000cc", startWeek: 1, durationWeeks: 1, tasks: ["Stakeholder interviews", "Requirements gathering", "Define project scope"] },
+  { name: "2. Environment Setup", color: "#1a1adf", startWeek: 2, durationWeeks: 1, tasks: ["Provision infrastructure", "Configure CI/CD pipeline", "Set up monitoring"] },
+  { name: "3. Core Development", color: "#3333e6", startWeek: 3, durationWeeks: 2, tasks: ["Backend API development", "Frontend implementation", "Database schema design", "Unit testing"] },
+  { name: "4. Integration & QA", color: "#4d4ded", startWeek: 5, durationWeeks: 1, tasks: ["Third-party integrations", "End-to-end testing", "Performance benchmarks"] },
+  { name: "5. UAT & Feedback", color: "#6666f0", startWeek: 6, durationWeeks: 1, tasks: ["User acceptance testing", "Bug fixes & adjustments", "Documentation"] },
+  { name: "6. Deployment & Go-Live", color: "#0000cc", startWeek: 7, durationWeeks: 1, tasks: ["Production deployment", "Monitoring & stabilization", "Handoff & training"] }
 ];
 
 function setBgMode(mode) {
@@ -396,8 +395,8 @@ function exportPNG() {
 function resetAll() {
   if (!confirm('¿Borrar todo y resetear?')) return;
   phases = [];
-  document.getElementById('chartTitle').value = 'Tiempos de Ejecución';
-  document.getElementById('chartSubtitle').value = 'Plan Proyecto — 2026';
+  document.getElementById('chartTitle').value = 'Project Timeline';
+  document.getElementById('chartSubtitle').value = 'Project Plan — 2026';
   document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('daysPerWeek').value = 7;
   document.getElementById('textColor').value = '#0a0a3e'; document.getElementById('textColorOn').checked = true;
@@ -407,8 +406,8 @@ function resetAll() {
   document.getElementById('bgColor1').value = '#ffffff';
   document.getElementById('bgGrad1').value = '#0000cc'; document.getElementById('bgGrad2').value = '#6666f0';
   document.getElementById('bgGradDir').value = 'to right';
-  document.getElementById('footerLogo').value = 'Signaturit Group';
-  document.getElementById('footerVersion').value = 'Versión 2026';
+  document.getElementById('footerLogo').value = 'Company Name';
+  document.getElementById('footerVersion').value = 'v1.0 — 2026';
   setBgMode('solid'); renderEditor(); render();
 }
 
