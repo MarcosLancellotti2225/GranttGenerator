@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gantt Generator — Signaturit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #12122a;
+    border-bottom: 1px solid #2a2a4a;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #7b7bf7;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .toolbar label {
+    font-size: 11px;
+    color: #888;
+    white-space: nowrap;
+  }
+
+  .toolbar input[type="text"],
+  .toolbar input[type="date"],
+  .toolbar input[type="number"],
+  .toolbar select {
+    background: #1e1e3a;
+    border: 1px solid #333360;
+    color: #ddd;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+  }
+
+  .toolbar input[type="text"] { width: 140px; }
+  .toolbar input[type="date"] { width: 130px; }
+  .toolbar input[type="number"] { width: 50px; }
+  .toolbar input[type="color"] {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+  }
+
+  .btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: #4444ee;
+    color: white;
+  }
+  .btn-primary:hover { background: #5555ff; }
+
+  .btn-success {
+    background: #22aa66;
+    color: white;
+  }
+  .btn-success:hover { background: #33bb77; }
+
+  .btn-danger {
+    background: #cc3355;
+    color: white;
+  }
+  .btn-danger:hover { background: #dd4466; }
+
+  .btn-ghost {
+    background: #2a2a4a;
+    color: #aaa;
+  }
+  .btn-ghost:hover { background: #333360; color: #ddd; }
+
+  .toolbar-spacer { flex: 1; }
+
+  /* ── EDITOR PANEL ── */
+  .workspace {
+    display: flex;
+    gap: 0;
+    min-height: calc(100vh - 54px);
+  }
+
+  .editor-panel {
+    width: 360px;
+    min-width: 360px;
+    background: #14142c;
+    border-right: 1px solid #2a2a4a;
+    overflow-y: auto;
+    padding: 16px;
+    max-height: calc(100vh - 54px);
+  }
+
+  .editor-section {
+    margin-bottom: 16px;
+  }
+
+  .editor-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7b7bf7;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+
+  .phase-card {
+    background: #1a1a36;
+    border: 1px solid #2a2a4a;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+
+  .phase-card:hover {
+    border-color: #4444ee;
+  }
+
+  .phase-card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .phase-card-header input[type="text"] {
+    flex: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #ddd;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+
+  .phase-card-header input[type="text"]:focus {
+    border-color: #4444ee;
+    outline: none;
+    background: #1e1e3a;
+  }
+
+  .phase-card-header input[type="color"] {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    background: none;
+  }
+
+  .phase-card-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .phase-card-row label {
+    font-size: 10px;
+    color: #777;
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  .phase-card-row select,
+  .phase-card-row input[type="number"] {
+    background: #1e1e3a;
+    border: 1px solid #2a2a4a;
+    color: #ccc;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: inherit;
+    flex: 1;
+  }
+
+  .task-list {
+    margin-top: 6px;
+    padding-left: 0;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 3px;
+  }
+
+  .task-item input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #bbb;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: inherit;
+  }
+
+  .task-item input:focus {
+    border-color: #333360;
+    outline: none;
+    background: #1e1e3a;
+  }
+
+  .task-remove {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 2px;
+    line-height: 1;
+  }
+  .task-remove:hover { color: #cc3355; }
+
+  .add-task-btn {
+    background: none;
+    border: 1px dashed #333360;
+    color: #666;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 4px;
+  }
+  .add-task-btn:hover { border-color: #4444ee; color: #4444ee; }
+
+  .phase-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+
+  /* ── PREVIEW ── */
+  .preview-panel {
+    flex: 1;
+    overflow: auto;
+    padding: 32px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    max-height: calc(100vh - 54px);
+  }
+
+  .preview-wrapper {
+    transform-origin: top center;
+  }
+
+  /* ── GANTT CHART (the exportable part) ── */
+  #gantt-export {
+    padding: 32px 36px;
+    min-width: 900px;
+  }
+
+  .gantt-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .gantt-subtitle {
+    font-size: 12px;
+    margin-bottom: 24px;
+    opacity: 0.5;
+  }
+
+  .gantt-grid {
+    width: 100%;
+  }
+
+  .gantt-grid-header {
+    display: flex;
+    border-bottom: 2px solid;
+    padding-bottom: 8px;
+    margin-bottom: 0;
+  }
+
+  .gantt-grid-header .gh-label {
+    width: 220px;
+    min-width: 220px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .gantt-grid-header .gh-weeks {
+    flex: 1;
+    display: flex;
+  }
+
+  .gantt-grid-header .gh-week {
+    flex: 1;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .gantt-grid-header .gh-week span {
+    display: block;
+    font-size: 9px;
+    font-weight: 400;
+    opacity: 0.5;
+  }
+
+  .gantt-grid-row {
+    display: flex;
+    border-bottom: 1px solid rgba(128,128,128,0.15);
+    min-height: 40px;
+  }
+
+  .gantt-grid-row:last-child {
+    border-bottom: none;
+  }
+
+  .gr-label {
+    width: 220px;
+    min-width: 220px;
+    padding: 8px 12px 8px 0;
+  }
+
+  .gr-phase-name {
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .gr-tasks {
+    list-style: none;
+  }
+
+  .gr-tasks li {
+    font-size: 9.5px;
+    opacity: 0.6;
+    line-height: 1.4;
+    padding-left: 10px;
+    position: relative;
+  }
+
+  .gr-tasks li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+  }
+
+  .gr-cells {
+    flex: 1;
+    display: flex;
+  }
+
+  .gr-cell {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 8px 3px;
+    position: relative;
+  }
+
+  .gr-cell::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(128,128,128,0.08);
+  }
+
+  .gr-bar {
+    width: 88%;
+    border-radius: 5px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.3px;
+  }
+
+  .gantt-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(128,128,128,0.15);
+  }
+
+  .gantt-footer-logo {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .gantt-footer-text {
+    font-size: 10px;
+    opacity: 0.4;
+  }
+
+  /* ── CHECKERBOARD BG for transparency preview ── */
+  .transparency-bg {
+    background-image:
+      linear-gradient(45deg, #222 25%, transparent 25%),
+      linear-gradient(-45deg, #222 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #222 75%),
+      linear-gradient(-45deg, transparent 75%, #222 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    border-radius: 8px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .editor-panel { width: 300px; min-width: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="toolbar-title">Gantt Generator</div>
+  <div class="toolbar-group">
+    <label>Título:</label>
+    <input type="text" id="chartTitle" value="Tiempos de Ejecución" oninput="render()">
+  </div>
+  <div class="toolbar-group">
+    <label>Subtítulo:</label>
+    <input type="text" id="chartSubtitle" value="Plan Proyecto MUTUA — Abril / Mayo 2026" oninput="render()">
+  </div>
+  <div class="toolbar-group">
+    <label>Inicio:</label>
+    <input type="date" id="startDate" value="2026-04-01" onchange="render()">
+  </div>
+  <div class="toolbar-group">
+    <label>Días/sem:</label>
+    <input type="number" id="daysPerWeek" value="7" min="1" max="14" onchange="render()">
+  </div>
+  <div class="toolbar-group">
+    <label>Texto:</label>
+    <input type="color" id="textColor" value="#0a0a3e" oninput="render()">
+  </div>
+  <div class="toolbar-group">
+    <label>Borde:</label>
+    <input type="color" id="borderColor" value="#0000cc" oninput="render()">
+  </div>
+  <div class="toolbar-group">
+    <label>Footer:</label>
+    <input type="text" id="footerLogo" value="Signaturit Group" oninput="render()" style="width:120px">
+  </div>
+  <div class="toolbar-group">
+    <label>Versión:</label>
+    <input type="text" id="footerVersion" value="Mutua — Versión 03/2026" oninput="render()" style="width:150px">
+  </div>
+  <div class="toolbar-spacer"></div>
+  <button class="btn btn-danger" onclick="resetAll()">🗑 Reset</button>
+  <button class="btn btn-success" onclick="exportPNG()">⬇ Descargar PNG</button>
+</div>
+
+<div class="workspace">
+  <!-- LEFT: Editor -->
+  <div class="editor-panel">
+    <div class="editor-section">
+      <div class="editor-section-title">Fases del Proyecto</div>
+      <div id="phaseList"></div>
+      <button class="btn btn-ghost" onclick="addPhase()" style="width:100%;margin-top:8px;">+ Agregar fase</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Preview -->
+  <div class="preview-panel">
+    <div class="preview-wrapper transparency-bg">
+      <div id="gantt-export"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let phases = [
+  { name: "1. Preparación de entornos SaaS", color: "#0000cc", startWeek: 1, durationWeeks: 1, tasks: ["Crear organización en demo", "Activar motor de firma", "Acceso a inhouse actual"] },
+  { name: "2. Configuración de autenticación", color: "#1a1adf", startWeek: 2, durationWeeks: 1, tasks: ["Definir SAML / SSO", "Configurar Key Controller"] },
+  { name: "3. Pruebas funcionales en Sandbox", color: "#3333e6", startWeek: 3, durationWeeks: 1, tasks: ["Habilitar entorno Sandbox", "Pruebas flujos de firma", "Certificados biométricos + Wacom", "Conectividad app biometría"] },
+  { name: "4. Coordinación con Camerfirma", color: "#4d4ded", startWeek: 4, durationWeeks: 1, tasks: ["Extracción certificados inhouse", "Reemisión en cloud"] },
+  { name: "5. Migración de certificados", color: "#6666f0", startWeek: 5, durationWeeks: 1, tasks: ["Importar certificados en SaaS", "Validar PINes", "Replicar delegaciones", "Preservar claves integración"] },
+  { name: "6. Replicar en producción", color: "#1a1adf", startWeek: 6, durationWeeks: 1, tasks: ["Crear organización en prod", "Aplicar configuraciones", "Redirigir app biométrica"] },
+  { name: "7. Pruebas finales y estabilización", color: "#0000cc", startWeek: 7, durationWeeks: 1, tasks: ["Pruebas end-to-end en prod", "Monitorización activa", "Resolución de incidencias"] }
+];
+
+function getTotalWeeks() {
+  let max = 0;
+  phases.forEach(p => {
+    const end = p.startWeek + p.durationWeeks - 1;
+    if (end > max) max = end;
+  });
+  return Math.max(max, 1);
+}
+
+function getWeekDates(weekIndex) {
+  const startDate = new Date(document.getElementById('startDate').value);
+  const dpw = parseInt(document.getElementById('daysPerWeek').value) || 7;
+  const weekStart = new Date(startDate);
+  weekStart.setDate(weekStart.getDate() + (weekIndex - 1) * dpw);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + dpw - 1);
+  const fmt = d => {
+    const dd = String(d.getDate()).padStart(2, '0');
+    const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return `${dd} ${months[d.getMonth()]}`;
+  };
+  return { label: `Sem ${weekIndex}`, range: `${fmt(weekStart)}–${fmt(weekEnd)}` };
+}
+
+// ── RENDER EDITOR ──
+function renderEditor() {
+  const container = document.getElementById('phaseList');
+  container.innerHTML = '';
+  const totalWeeks = getTotalWeeks();
+
+  phases.forEach((phase, i) => {
+    const card = document.createElement('div');
+    card.className = 'phase-card';
+
+    // Build week options
+    let startOpts = '';
+    for (let w = 1; w <= Math.max(totalWeeks + 2, 12); w++) {
+      startOpts += `<option value="${w}" ${w === phase.startWeek ? 'selected' : ''}>Sem ${w}</option>`;
+    }
+    let durOpts = '';
+    for (let d = 1; d <= 8; d++) {
+      durOpts += `<option value="${d}" ${d === phase.durationWeeks ? 'selected' : ''}>${d}</option>`;
+    }
+
+    let tasksHTML = '';
+    phase.tasks.forEach((t, ti) => {
+      tasksHTML += `
+        <div class="task-item">
+          <input type="text" value="${t}" oninput="phases[${i}].tasks[${ti}]=this.value;render()">
+          <button class="task-remove" onclick="phases[${i}].tasks.splice(${ti},1);renderEditor();render()">×</button>
+        </div>`;
+    });
+
+    card.innerHTML = `
+      <div class="phase-card-header">
+        <input type="color" value="${phase.color}" oninput="phases[${i}].color=this.value;render()">
+        <input type="text" value="${phase.name}" oninput="phases[${i}].name=this.value;render()">
+        <button class="task-remove" onclick="phases.splice(${i},1);renderEditor();render()">🗑</button>
+      </div>
+      <div class="phase-card-row">
+        <label>Inicio:</label>
+        <select onchange="phases[${i}].startWeek=parseInt(this.value);render()">${startOpts}</select>
+        <label style="width:30px">Dur:</label>
+        <select onchange="phases[${i}].durationWeeks=parseInt(this.value);render()">${durOpts}</select>
+      </div>
+      <div class="task-list">${tasksHTML}</div>
+      <button class="add-task-btn" onclick="phases[${i}].tasks.push('Nueva tarea');renderEditor();render()">+ tarea</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function addPhase() {
+  const tw = getTotalWeeks();
+  phases.push({
+    name: `${phases.length + 1}. Nueva fase`,
+    color: '#4444ee',
+    startWeek: tw + 1,
+    durationWeeks: 1,
+    tasks: ['Tarea ejemplo']
+  });
+  renderEditor();
+  render();
+}
+
+// ── RENDER GANTT ──
+function render() {
+  const el = document.getElementById('gantt-export');
+  const title = document.getElementById('chartTitle').value;
+  const subtitle = document.getElementById('chartSubtitle').value;
+  const textColor = document.getElementById('textColor').value;
+  const borderColor = document.getElementById('borderColor').value;
+  const footerLogo = document.getElementById('footerLogo').value;
+  const footerVersion = document.getElementById('footerVersion').value;
+  const totalWeeks = getTotalWeeks();
+
+  // Header weeks
+  let weeksHeaderHTML = '';
+  for (let w = 1; w <= totalWeeks; w++) {
+    const wd = getWeekDates(w);
+    weeksHeaderHTML += `<div class="gh-week" style="color:${textColor}">${wd.label}<span>${wd.range}</span></div>`;
+  }
+
+  // Rows
+  let rowsHTML = '';
+  phases.forEach(phase => {
+    let tasksLi = phase.tasks.map(t => `<li>${t}</li>`).join('');
+    let cellsHTML = '';
+    for (let w = 1; w <= totalWeeks; w++) {
+      const isActive = w >= phase.startWeek && w < phase.startWeek + phase.durationWeeks;
+      cellsHTML += `<div class="gr-cell">${isActive ? `<div class="gr-bar" style="background:${phase.color};">${getWeekDates(w).label}</div>` : ''}</div>`;
+    }
+    rowsHTML += `
+      <div class="gantt-grid-row">
+        <div class="gr-label">
+          <div class="gr-phase-name" style="color:${textColor}">${phase.name}</div>
+          <ul class="gr-tasks" style="color:${textColor}">${tasksLi}</ul>
+        </div>
+        <div class="gr-cells">${cellsHTML}</div>
+      </div>`;
+  });
+
+  el.innerHTML = `
+    <div class="gantt-title" style="color:${borderColor}">${title}</div>
+    <div class="gantt-subtitle" style="color:${textColor}">${subtitle}</div>
+    <div class="gantt-grid">
+      <div class="gantt-grid-header" style="border-bottom-color:${borderColor}">
+        <div class="gh-label" style="color:${textColor}">Fase</div>
+        <div class="gh-weeks">${weeksHeaderHTML}</div>
+      </div>
+      ${rowsHTML}
+    </div>
+    <div class="gantt-footer">
+      <div class="gantt-footer-logo" style="color:${borderColor}">${footerLogo}</div>
+      <div class="gantt-footer-text" style="color:${textColor}">${footerVersion}</div>
+    </div>
+  `;
+}
+
+// ── EXPORT ──
+function exportPNG() {
+  const el = document.getElementById('gantt-export');
+  html2canvas(el, {
+    backgroundColor: null,
+    scale: 3,
+    useCORS: true,
+    logging: false
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'gantt-chart.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+// ── RESET ──
+function resetAll() {
+  if (!confirm('¿Borrar todas las fases y volver a valores por defecto?')) return;
+  phases = [];
+  document.getElementById('chartTitle').value = 'Tiempos de Ejecución';
+  document.getElementById('chartSubtitle').value = 'Plan Proyecto — 2026';
+  document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('daysPerWeek').value = 7;
+  document.getElementById('textColor').value = '#0a0a3e';
+  document.getElementById('borderColor').value = '#0000cc';
+  document.getElementById('footerLogo').value = 'Signaturit Group';
+  document.getElementById('footerVersion').value = 'Versión 2026';
+  renderEditor();
+  render();
+}
+
+// ── INIT ──
+renderEditor();
+render();
+</script>
+
+</body>
+</html>
