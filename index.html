@@ -18,13 +18,11 @@
   .toolbar-title { font-size: 14px; font-weight: 700; color: #7b7bf7; margin-right: 4px; white-space: nowrap; }
   .toolbar-group { display: flex; align-items: center; gap: 6px; }
   .toolbar label { font-size: 11px; color: #888; white-space: nowrap; }
-  .toolbar input[type="text"], .toolbar input[type="date"], .toolbar input[type="number"] {
+  .toolbar input[type="text"], .toolbar select {
     background: #1e1e3a; border: 1px solid #333360; color: #ddd;
     padding: 5px 8px; border-radius: 6px; font-size: 12px; font-family: inherit;
   }
   .toolbar input[type="text"] { width: 140px; }
-  .toolbar input[type="date"] { width: 130px; }
-  .toolbar input[type="number"] { width: 50px; }
   .toolbar-spacer { flex: 1; }
   .btn { padding: 6px 14px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.15s; }
   .btn-success { background: #22aa66; color: white; } .btn-success:hover { background: #33bb77; }
@@ -44,7 +42,6 @@
     text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;
   }
 
-  /* Color controls */
   .color-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #1e1e3a; }
   .color-row label.cr-label { font-size: 11px; color: #aaa; width: 60px; flex-shrink: 0; }
   .color-row input[type="color"] { width: 28px; height: 28px; border: none; border-radius: 4px; cursor: pointer; padding: 0; background: none; flex-shrink: 0; }
@@ -76,7 +73,6 @@
     padding: 3px 6px; border-radius: 4px; font-size: 11px; font-family: inherit;
   }
 
-  /* Phase cards */
   .phase-card { background: #1a1a36; border: 1px solid #2a2a4a; border-radius: 8px; padding: 10px; margin-bottom: 8px; transition: border-color 0.15s; }
   .phase-card:hover { border-color: #4444ee; }
   .phase-card-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
@@ -123,28 +119,40 @@
     background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
   }
 
+  /* ── GANTT (CSS Grid based) ── */
   #gantt-export { padding: 28px 32px; min-width: 880px; border-radius: 10px; }
   .gantt-title { font-size: 20px; font-weight: 800; margin-bottom: 3px; }
   .gantt-subtitle { font-size: 11px; margin-bottom: 20px; opacity: 0.5; }
-  .gantt-grid { width: 100%; }
-  .gantt-grid-header { display: flex; border-bottom: 2px solid; padding-bottom: 7px; }
-  .gantt-grid-header .gh-label { width: 200px; min-width: 200px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-  .gantt-grid-header .gh-weeks { flex: 1; display: flex; }
-  .gantt-grid-header .gh-week { flex: 1; text-align: center; font-size: 9.5px; font-weight: 600; line-height: 1.3; }
-  .gantt-grid-header .gh-week span { display: block; font-size: 8.5px; font-weight: 400; opacity: 0.5; }
-  .gantt-grid-row { display: flex; min-height: 36px; }
-  .gantt-grid-row:last-child { border-bottom: none; }
-  .gr-label { width: 200px; min-width: 200px; padding: 6px 10px 6px 0; }
-  .gr-phase-name { font-size: 10.5px; font-weight: 700; margin-bottom: 2px; }
-  .gr-tasks { list-style: none; }
-  .gr-tasks li { font-size: 9px; opacity: 0.6; line-height: 1.35; padding-left: 9px; position: relative; }
-  .gr-tasks li::before { content: '–'; position: absolute; left: 0; }
-  .gr-cells { flex: 1; display: flex; }
-  .gr-cell { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 6px 2px; }
-  .gr-bar { width: 90%; border-radius: 4px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 8.5px; font-weight: 700; color: white; letter-spacing: 0.3px; }
   .gantt-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 10px; }
   .gantt-footer-logo { font-size: 12px; font-weight: 800; }
   .gantt-footer-text { font-size: 9px; opacity: 0.4; }
+
+  .g-table { width: 100%; }
+
+  /* Header row */
+  .g-header { display: grid; padding-bottom: 7px; }
+  .g-header-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: end; }
+  .g-header-unit { font-size: 9.5px; font-weight: 600; text-align: center; display: flex; align-items: end; justify-content: center; }
+
+  /* Data row */
+  .g-row { display: grid; min-height: 36px; }
+  .g-row-label { padding: 6px 10px 6px 0; }
+  .g-phase-name { font-size: 10.5px; font-weight: 700; margin-bottom: 2px; }
+  .g-tasks { list-style: none; }
+  .g-tasks li { font-size: 9px; opacity: 0.6; line-height: 1.35; padding-left: 9px; position: relative; }
+  .g-tasks li::before { content: '–'; position: absolute; left: 0; }
+
+  /* The bar spans multiple columns */
+  .g-bar-wrap { display: flex; align-items: flex-start; padding: 6px 4px; }
+  .g-bar {
+    width: 100%; border-radius: 4px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8.5px; font-weight: 700; color: white; letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  /* Empty cells for grid lines */
+  .g-cell-empty { }
 
   @media (max-width: 1100px) { .editor-panel { width: 300px; min-width: 300px; } }
 </style>
@@ -162,12 +170,11 @@
     <input type="text" id="chartSubtitle" value="Project Plan — Q2 2026" oninput="render()">
   </div>
   <div class="toolbar-group">
-    <label>Inicio:</label>
-    <input type="date" id="startDate" value="2026-04-06" onchange="render()">
-  </div>
-  <div class="toolbar-group">
-    <label>Días/sem:</label>
-    <input type="number" id="daysPerWeek" value="7" min="1" max="14" onchange="render()">
+    <label>Unidad:</label>
+    <select id="unitMode" onchange="renderEditor();render()">
+      <option value="weeks">Semanas</option>
+      <option value="days">Días</option>
+    </select>
   </div>
   <div class="toolbar-group">
     <label>Footer:</label>
@@ -185,34 +192,28 @@
 <div class="workspace">
   <div class="editor-panel">
 
-    <!-- COLORS -->
     <div class="editor-section">
       <div class="editor-section-title">Colores</div>
-
       <div class="color-row">
         <label class="cr-label">Texto</label>
         <label class="color-toggle"><input type="checkbox" id="textColorOn" checked onchange="render()"><span class="slider"></span></label>
         <span id="textColorWrap"><input type="color" id="textColor" value="#0a0a3e" oninput="render()"></span>
       </div>
-
       <div class="color-row">
         <label class="cr-label">Acento</label>
         <label class="color-toggle"><input type="checkbox" id="borderColorOn" checked onchange="render()"><span class="slider"></span></label>
         <span id="borderColorWrap"><input type="color" id="borderColor" value="#0000cc" oninput="render()"></span>
       </div>
-
       <div class="color-row">
         <label class="cr-label">Footer</label>
         <label class="color-toggle"><input type="checkbox" id="footerColorOn" checked onchange="render()"><span class="slider"></span></label>
         <span id="footerColorWrap"><input type="color" id="footerColor" value="#0000cc" oninput="render()"></span>
       </div>
-
       <div class="color-row">
         <label class="cr-label">Líneas</label>
         <label class="color-toggle"><input type="checkbox" id="gridLinesOn" checked onchange="render()"><span class="slider"></span></label>
         <span id="gridLinesWrap"><input type="color" id="gridLinesColor" value="#cccccc" oninput="render()"></span>
       </div>
-
       <div style="margin-top:12px">
         <div style="font-size:11px;color:#aaa;margin-bottom:6px;font-weight:600;">Fondo</div>
         <div class="bg-mode-row">
@@ -249,7 +250,6 @@
       </div>
     </div>
 
-    <!-- PHASES -->
     <div class="editor-section">
       <div class="editor-section-title">Fases del Proyecto</div>
       <div id="phaseList"></div>
@@ -267,13 +267,29 @@
 <script>
 let bgMode = 'solid';
 let phases = [
-  { name: "1. Discovery & Planning", color: "#0000cc", startWeek: 1, durationWeeks: 1, tasks: ["Stakeholder interviews", "Requirements gathering", "Define project scope"] },
-  { name: "2. Environment Setup", color: "#1a1adf", startWeek: 2, durationWeeks: 1, tasks: ["Provision infrastructure", "Configure CI/CD pipeline", "Set up monitoring"] },
-  { name: "3. Core Development", color: "#3333e6", startWeek: 3, durationWeeks: 2, tasks: ["Backend API development", "Frontend implementation", "Database schema design", "Unit testing"] },
-  { name: "4. Integration & QA", color: "#4d4ded", startWeek: 5, durationWeeks: 1, tasks: ["Third-party integrations", "End-to-end testing", "Performance benchmarks"] },
-  { name: "5. UAT & Feedback", color: "#6666f0", startWeek: 6, durationWeeks: 1, tasks: ["User acceptance testing", "Bug fixes & adjustments", "Documentation"] },
-  { name: "6. Deployment & Go-Live", color: "#0000cc", startWeek: 7, durationWeeks: 1, tasks: ["Production deployment", "Monitoring & stabilization", "Handoff & training"] }
+  { name: "1. Discovery & Planning", color: "#0000cc", start: 1, duration: 1, tasks: ["Stakeholder interviews", "Requirements gathering", "Define project scope"] },
+  { name: "2. Environment Setup", color: "#1a1adf", start: 2, duration: 2, tasks: ["Provision infrastructure", "Configure CI/CD pipeline", "Set up monitoring"] },
+  { name: "3. Core Development", color: "#3333e6", start: 4, duration: 3, tasks: ["Backend API development", "Frontend implementation", "Database schema design", "Unit testing"] },
+  { name: "4. Integration & QA", color: "#4d4ded", start: 7, duration: 2, tasks: ["Third-party integrations", "End-to-end testing", "Performance benchmarks"] },
+  { name: "5. UAT & Feedback", color: "#6666f0", start: 9, duration: 1, tasks: ["User acceptance testing", "Bug fixes & adjustments", "Documentation"] },
+  { name: "6. Deployment & Go-Live", color: "#0000cc", start: 10, duration: 1, tasks: ["Production deployment", "Monitoring & stabilization", "Handoff & training"] }
 ];
+
+function getUnit() { return document.getElementById('unitMode').value; }
+function getUnitShort() { return getUnit() === 'days' ? 'D' : 'S'; }
+function getUnitLabel() { return getUnit() === 'days' ? 'Día' : 'Sem'; }
+
+function getTotalUnits() {
+  let max = 0;
+  phases.forEach(p => { const end = p.start + p.duration - 1; if (end > max) max = end; });
+  return Math.max(max, 1);
+}
+
+function getBarLabel(start, duration) {
+  const s = getUnitShort();
+  if (duration === 1) return `${s}${start}`;
+  return `${s}${start} – ${s}${start + duration - 1}`;
+}
 
 function setBgMode(mode) {
   bgMode = mode;
@@ -295,39 +311,52 @@ function getBgStyle() {
   return `linear-gradient(${dir}, ${c1}, ${c2})`;
 }
 
-function getTotalWeeks() {
-  let max = 0;
-  phases.forEach(p => { const end = p.startWeek + p.durationWeeks - 1; if (end > max) max = end; });
-  return Math.max(max, 1);
-}
-
-function getWeekDates(weekIndex) {
-  const startDate = new Date(document.getElementById('startDate').value);
-  const dpw = parseInt(document.getElementById('daysPerWeek').value) || 7;
-  const ws = new Date(startDate); ws.setDate(ws.getDate() + (weekIndex - 1) * dpw);
-  const we = new Date(ws); we.setDate(we.getDate() + dpw - 1);
-  const fmt = d => { const dd = String(d.getDate()).padStart(2,'0'); const m = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']; return `${dd} ${m[d.getMonth()]}`; };
-  return { label: `Sem ${weekIndex}`, range: `${fmt(ws)}–${fmt(we)}` };
-}
-
+// ── EDITOR ──
 function renderEditor() {
   const c = document.getElementById('phaseList'); c.innerHTML = '';
-  const tw = getTotalWeeks();
+  const tu = getTotalUnits();
+  const uLabel = getUnitLabel();
+  const maxUnits = Math.max(tu + 5, 20);
+
   phases.forEach((p, i) => {
     const card = document.createElement('div'); card.className = 'phase-card';
-    let so = ''; for (let w=1; w<=Math.max(tw+2,12); w++) so += `<option value="${w}" ${w===p.startWeek?'selected':''}>Sem ${w}</option>`;
-    let du = ''; for (let d=1; d<=8; d++) du += `<option value="${d}" ${d===p.durationWeeks?'selected':''}>${d}</option>`;
-    let th = ''; p.tasks.forEach((t,ti) => { th += `<div class="task-item"><input type="text" value="${t}" oninput="phases[${i}].tasks[${ti}]=this.value;render()"><button class="task-remove" onclick="phases[${i}].tasks.splice(${ti},1);renderEditor();render()">×</button></div>`; });
-    card.innerHTML = `<div class="phase-card-header"><input type="color" value="${p.color}" oninput="phases[${i}].color=this.value;render()"><input type="text" value="${p.name}" oninput="phases[${i}].name=this.value;render()"><button class="task-remove" onclick="phases.splice(${i},1);renderEditor();render()">🗑</button></div><div class="phase-card-row"><label>Inicio:</label><select onchange="phases[${i}].startWeek=parseInt(this.value);render()">${so}</select><label style="width:30px">Dur:</label><select onchange="phases[${i}].durationWeeks=parseInt(this.value);render()">${du}</select></div><div class="task-list">${th}</div><button class="add-task-btn" onclick="phases[${i}].tasks.push('Nueva tarea');renderEditor();render()">+ tarea</button>`;
+    let so = ''; for (let w = 1; w <= maxUnits; w++) so += `<option value="${w}" ${w === p.start ? 'selected' : ''}>${uLabel} ${w}</option>`;
+    let du = ''; for (let d = 1; d <= maxUnits; d++) du += `<option value="${d}" ${d === p.duration ? 'selected' : ''}>${d} ${d === 1 ? getUnit().slice(0, -1) : getUnit()}</option>`;
+    // Fix: semana/semanas, día/días
+    du = '';
+    for (let d = 1; d <= maxUnits; d++) {
+      const unitWord = getUnit() === 'days' ? (d === 1 ? 'día' : 'días') : (d === 1 ? 'sem' : 'sems');
+      du += `<option value="${d}" ${d === p.duration ? 'selected' : ''}>${d} ${unitWord}</option>`;
+    }
+
+    let th = ''; p.tasks.forEach((t, ti) => {
+      th += `<div class="task-item"><input type="text" value="${t}" oninput="phases[${i}].tasks[${ti}]=this.value;render()"><button class="task-remove" onclick="phases[${i}].tasks.splice(${ti},1);renderEditor();render()">×</button></div>`;
+    });
+
+    card.innerHTML = `
+      <div class="phase-card-header">
+        <input type="color" value="${p.color}" oninput="phases[${i}].color=this.value;render()">
+        <input type="text" value="${p.name}" oninput="phases[${i}].name=this.value;render()">
+        <button class="task-remove" onclick="phases.splice(${i},1);renderEditor();render()">🗑</button>
+      </div>
+      <div class="phase-card-row">
+        <label>Inicio:</label>
+        <select onchange="phases[${i}].start=parseInt(this.value);renderEditor();render()">${so}</select>
+        <label style="width:30px">Dur:</label>
+        <select onchange="phases[${i}].duration=parseInt(this.value);renderEditor();render()">${du}</select>
+      </div>
+      <div class="task-list">${th}</div>
+      <button class="add-task-btn" onclick="phases[${i}].tasks.push('New task');renderEditor();render()">+ task</button>`;
     c.appendChild(card);
   });
 }
 
 function addPhase() {
-  phases.push({ name: `${phases.length+1}. Nueva fase`, color: '#4444ee', startWeek: getTotalWeeks()+1, durationWeeks: 1, tasks: ['Tarea ejemplo'] });
+  phases.push({ name: `${phases.length + 1}. New Phase`, color: '#4444ee', start: getTotalUnits() + 1, duration: 1, tasks: ['Example task'] });
   renderEditor(); render();
 }
 
+// ── RENDER GANTT ──
 function render() {
   const el = document.getElementById('gantt-export');
   const wrapper = document.getElementById('previewWrapper');
@@ -335,7 +364,8 @@ function render() {
   const subtitle = document.getElementById('chartSubtitle').value;
   const fLogo = document.getElementById('footerLogo').value;
   const fVer = document.getElementById('footerVersion').value;
-  const tw = getTotalWeeks();
+  const tu = getTotalUnits();
+  const uLabel = getUnitLabel();
 
   const textOn = document.getElementById('textColorOn').checked;
   const borderOn = document.getElementById('borderColorOn').checked;
@@ -356,29 +386,52 @@ function render() {
   el.style.background = getBgStyle();
   wrapper.classList.toggle('transparency-bg', bgMode === 'none');
 
-  let wh = '';
-  for (let w=1; w<=tw; w++) { const d = getWeekDates(w); wh += `<div class="gh-week" style="color:${textColor}">${d.label}<span>${d.range}</span></div>`; }
+  // Grid template: label column + N unit columns
+  const gridCols = `200px repeat(${tu}, 1fr)`;
 
-  let rows = '';
+  // Header
+  let headerCells = `<div class="g-header-label" style="color:${textColor}">Fase</div>`;
+  for (let u = 1; u <= tu; u++) {
+    headerCells += `<div class="g-header-unit" style="color:${textColor};border-left:1px solid ${gridBorder}">${uLabel} ${u}</div>`;
+  }
+
+  // Rows
+  let rowsHTML = '';
   phases.forEach(p => {
     const tli = p.tasks.map(t => `<li>${t}</li>`).join('');
-    let cells = '';
-    for (let w=1; w<=tw; w++) {
-      const active = w >= p.startWeek && w < p.startWeek + p.durationWeeks;
-      cells += `<div class="gr-cell" style="border-left:1px solid ${gridBorder}">${active ? `<div class="gr-bar" style="background:${p.color}">${getWeekDates(w).label}</div>` : ''}</div>`;
+    // Label occupies column 1
+    // Bar occupies columns (start+1) to (start+duration) in grid terms (col 1 is label)
+    const gridColStart = p.start + 1; // +1 because col 1 is label
+    const gridColEnd = p.start + p.duration + 1;
+    const barLabel = getBarLabel(p.start, p.duration);
+
+    // Build empty cells for grid lines
+    let cellsBefore = '';
+    for (let u = 1; u <= tu; u++) {
+      cellsBefore += `<div class="g-cell-empty" style="grid-column:${u + 1};border-left:1px solid ${gridBorder}"></div>`;
     }
-    rows += `<div class="gantt-grid-row" style="border-bottom:1px solid ${gridBorder}"><div class="gr-label"><div class="gr-phase-name" style="color:${textColor}">${p.name}</div><ul class="gr-tasks" style="color:${textColor}">${tli}</ul></div><div class="gr-cells">${cells}</div></div>`;
+
+    rowsHTML += `
+      <div class="g-row" style="grid-template-columns:${gridCols};border-bottom:1px solid ${gridBorder}">
+        <div class="g-row-label" style="grid-column:1;grid-row:1;">
+          <div class="g-phase-name" style="color:${textColor}">${p.name}</div>
+          <ul class="g-tasks" style="color:${textColor}">${tli}</ul>
+        </div>
+        ${cellsBefore}
+        <div class="g-bar-wrap" style="grid-column:${gridColStart}/${gridColEnd};grid-row:1;">
+          <div class="g-bar" style="background:${p.color}">${barLabel}</div>
+        </div>
+      </div>`;
   });
 
   el.innerHTML = `
     <div class="gantt-title" style="color:${borderOn ? accentColor : textColor}">${title}</div>
     <div class="gantt-subtitle" style="color:${textColor}">${subtitle}</div>
-    <div class="gantt-grid">
-      <div class="gantt-grid-header" style="border-bottom-color:${accentColor}">
-        <div class="gh-label" style="color:${textColor}">Fase</div>
-        <div class="gh-weeks">${wh}</div>
+    <div class="g-table">
+      <div class="g-header" style="grid-template-columns:${gridCols};border-bottom:2px solid ${accentColor}">
+        ${headerCells}
       </div>
-      ${rows}
+      ${rowsHTML}
     </div>
     <div class="gantt-footer" style="border-top:1px solid ${gridBorder}">
       <div class="gantt-footer-logo" style="color:${footerColor}">${fLogo}</div>
@@ -386,19 +439,20 @@ function render() {
     </div>`;
 }
 
+// ── EXPORT ──
 function exportPNG() {
   html2canvas(document.getElementById('gantt-export'), { backgroundColor: null, scale: 3, useCORS: true, logging: false }).then(c => {
     const a = document.createElement('a'); a.download = 'gantt-chart.png'; a.href = c.toDataURL('image/png'); a.click();
   });
 }
 
+// ── RESET ──
 function resetAll() {
-  if (!confirm('¿Borrar todo y resetear?')) return;
+  if (!confirm('Clear everything and reset?')) return;
   phases = [];
   document.getElementById('chartTitle').value = 'Project Timeline';
   document.getElementById('chartSubtitle').value = 'Project Plan — 2026';
-  document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('daysPerWeek').value = 7;
+  document.getElementById('unitMode').value = 'weeks';
   document.getElementById('textColor').value = '#0a0a3e'; document.getElementById('textColorOn').checked = true;
   document.getElementById('borderColor').value = '#0000cc'; document.getElementById('borderColorOn').checked = true;
   document.getElementById('footerColor').value = '#0000cc'; document.getElementById('footerColorOn').checked = true;
@@ -411,6 +465,7 @@ function resetAll() {
   setBgMode('solid'); renderEditor(); render();
 }
 
+// ── INIT ──
 renderEditor(); render();
 </script>
 </body>
